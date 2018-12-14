@@ -1,0 +1,16 @@
+Example usage:
+  fj init
+  fj info scaffold
+  fj install scaffold
+  fj uninstall scaffold
+  fj list [ALIAS]
+  fj new scaffold [target]
+
+Troubleshooting:
+  fj config // show cfg
+  fj doctor // ...
+
+Further help:
+  fj commands
+  fj help [COMMAND]
+  https://www.guxingke.com
