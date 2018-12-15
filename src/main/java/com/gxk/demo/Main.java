@@ -13,10 +13,13 @@ import com.gxk.demo.core.Env;
 import com.gxk.demo.core.EnvHolder;
 import com.gxk.demo.generater.DefaultGenerator;
 import com.gxk.demo.generater.GeneratorRegistry;
+import com.gxk.demo.logger.Log;
 import com.moandjiezana.toml.Toml;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -49,15 +52,20 @@ public class Main {
 
     // init cfg
     Env<String, Object> sysCfg = new Env<>();
-    sysCfg.put("user.home", Const.USER_HOME);
-    sysCfg.put("user.dir", Const.USER_DIR);
-    sysCfg.put("fj.config.path", Const.FJ_CFG_PATH);
+    sysCfg.put(Const.KEY_USER_HOME, System.getProperty("user.home"));
+    sysCfg.put(Const.KEY_USER_DIR, System.getProperty("user.dir"));
+    sysCfg.put(Const.FJ_KEY_CFG_PATH, System.getProperty("user.home") + "/" + Const.FJ_CFG_PATH);
+
+    if (Files.exists(Paths.get(sysCfg.get(Const.FJ_KEY_CFG_PATH).toString()))) {
+      sysCfg.put(Const.FJ_KEY_INIT, "true");
+    }
 
     EnvHolder.setEnv(sysCfg);
 
     // fj config
     Env<String, Object> fjCfg = new Env<>("fj", sysCfg);
-    Path path = Paths.get(Const.FJ_CFG_PATH);
+    Path path = Paths.get((String) sysCfg.get(Const.FJ_KEY_CFG_PATH));
+
     if (path.toFile().exists()) {
       Map<String, Object> map = new Toml().read(path.toFile()).toMap();
       map.forEach(fjCfg::put);
@@ -65,10 +73,9 @@ public class Main {
       EnvHolder.setEnv(fjCfg);
     }
 
-    // fj dynamic cfg
-    Env<String, Object> dyCfg = new Env<>("dy", fjCfg);
-
     if (fjCfg.containsKey(Const.CFG_KEY_SCAFFOLD_REPO)) {
+      // fj dynamic cfg
+      Env<String, Object> dyCfg = new Env<>("dy", fjCfg);
       Map<String, String> repo = (Map<String, String>) fjCfg.get(Const.CFG_KEY_SCAFFOLD_REPO);
 
       Map<String, String> scaffolds = new HashMap<>();
@@ -89,6 +96,17 @@ public class Main {
 
       EnvHolder.setEnv(dyCfg);
     }
+
+    // dir sensitivity
+    File userFj = Paths.get(EnvHolder.getEnv().get(Const.KEY_USER_DIR).toString(), "fj.toml").toFile();
+
+    if (userFj.exists() && userFj.isFile() && userFj.canRead()) {
+      Env<String, Object> env = new Env<>("user", EnvHolder.getEnv());
+      new Toml().read(userFj).toMap().forEach(env::put);
+
+      EnvHolder.setEnv(env);
+    }
+
   }
 
   void run(String action, String... args) {
@@ -99,12 +117,18 @@ public class Main {
 
       handler = registry.get("-h");
     }
+
+    boolean isDebugLevel = Arrays.stream(args).anyMatch(it -> it.startsWith("--debug"));
+    if (isDebugLevel) {
+      Log.level = 2;
+    }
+
     handler.apply(args);
   }
 
   public static void main(String[] args) {
     if (args.length == 0) {
-      args = new String[] {"-h"};
+      args = new String[]{"-h"};
     }
     List<String> ags = Arrays.asList(args);
     String action = ags.get(0);

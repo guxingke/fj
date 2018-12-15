@@ -235,10 +235,12 @@ public class NewCmd implements CmdHandler {
       Scanner scanner = new Scanner(System.in);
       scaffoldCfg.forEach((key, val) -> {
         if (val instanceof String) {
-          fj.info(String.format("%s : enter to use default [%s]:", key, val));
-          String option = scanner.nextLine();
-          if (!option.isEmpty()) {
-            options.put(key, option);
+          if (!key.equals("name")) {
+            fj.info(String.format("%s : enter to use default [%s]:", key, val));
+            String option = scanner.nextLine();
+            if (!option.isEmpty()) {
+              options.put(key, option);
+            }
           }
         } else {
           options.put(key, val);

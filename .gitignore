@@ -1,8 +1,8 @@
-
 .tmp/
+temp/
 
 target/
 .idea
-gen.iml
+*.iml
 
 dependency-reduced-pom.xml

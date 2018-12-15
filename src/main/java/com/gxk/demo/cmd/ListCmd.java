@@ -5,6 +5,8 @@ import com.gxk.demo.core.Env;
 import com.gxk.demo.core.EnvHolder;
 import com.gxk.demo.logger.ILog;
 import com.gxk.demo.logger.LogFactory;
+import com.gxk.demo.util.CmdUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,40 +25,39 @@ public class ListCmd implements CmdHandler {
 
   @Override
   public void apply(String... args) {
-    boolean help = args.length > 0 && Arrays.asList("-h", "--help").contains(args[0]);
-    if (help) {
-      System.out.println("help ....");
+    if (CmdUtils.isHelpCmd(args)) {
+      fj.info("help ....");
     }
 
     // get global config
     Env env = EnvHolder.getEnv();
     Object val = env.get(Const.CFG_KEY_SCAFFOLD_REPO);
     if (val == null || !(val instanceof Map)) {
-      System.out.println("init first please.");
+      fj.error("init first please.");
       return;
     }
 
     Map<String, String> sc = (Map<String, String>) val;
     sc.forEach((key, vp) -> {
-      System.out.println("Scaffolds Group: " + key);
+      fj.error("Scaffolds Group: " + key);
 
       Path path = Paths.get(vp);
       File file = path.toFile();
       if (!file.exists()) {
-        System.out.println("Nothing.");
+        fj.info("Nothing.");
         return;
       }
 
       try {
         Files.list(path).map(it -> it.toFile().getName())
           .forEach(it -> {
-            System.out.println("Scaffold: " + it);
+            fj.info("Scaffold: " + it);
           });
       } catch (IOException e) {
         log.error("io err", e);
       }
 
-      System.out.println("\n-----------------\n");
+      fj.info("\n-----------------\n");
     });
   }
 }

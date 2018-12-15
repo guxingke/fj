@@ -47,6 +47,6 @@ public class MainTest {
 
   @Test
   public void test_new() {
-    main.run("new", "demo", ".tmp", "--fj.new.default=true");
+    main.run("new", "demo", "test", "--fj.new.default=true");
   }
 }

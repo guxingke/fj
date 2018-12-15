@@ -1,11 +1,11 @@
 package com.gxk.demo.constants;
 
 public abstract class Const {
-  public static final String USER_HOME = System.getProperty("user.home");
-  public static final String USER_DIR = System.getProperty("user.dir");
-  public static final String FJ_DIR = USER_HOME + "/.fj";
-  public static final String FJ_CFG_PATH = FJ_DIR + "/config/fj.toml";
+  // The relative path
+  public static final String FJ_CFG_PATH = ".fj/config/fj.toml";
 
+  public static final String FJ_KEY_CFG_PATH = "fj.config.path";
+  public static final String FJ_KEY_INIT = "fj.config.init";
 
   public static final String KEY_USER_HOME = "user.home";
   public static final String KEY_USER_DIR = "user.dir";
