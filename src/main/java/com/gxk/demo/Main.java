@@ -7,6 +7,7 @@ import com.gxk.demo.cmd.HelpCmd;
 import com.gxk.demo.cmd.InitCmd;
 import com.gxk.demo.cmd.ListCmd;
 import com.gxk.demo.cmd.NewCmd;
+import com.gxk.demo.cmd.StatusCmd;
 import com.gxk.demo.constants.Const;
 import com.gxk.demo.core.Env;
 import com.gxk.demo.core.EnvHolder;
@@ -37,10 +38,12 @@ public class Main {
     registry.reg(Arrays.asList("-v", "--version"), (args) -> Arrays.stream(args).forEach(System.out::println));
     registry.reg("init", new InitCmd());
     registry.reg("config", new ConfigCmd());
-    registry.reg("install", (args) -> Arrays.stream(args).forEach(System.out::println));
-    registry.reg("uninstall", (args) -> Arrays.stream(args).forEach(System.out::println));
-    registry.reg("list", new ListCmd());
-    registry.reg("new", new NewCmd());
+    registry.reg(Arrays.asList("i", "install"), (args) -> Arrays.stream(args).forEach(System.out::println));
+    registry.reg(Arrays.asList("ui", "uninstall"), (args) -> Arrays.stream(args).forEach(System.out::println));
+    registry.reg(Arrays.asList("ls", "list"), new ListCmd());
+    registry.reg(Arrays.asList("n", "new"), new NewCmd());
+    registry.reg(Arrays.asList("st", "status"), new StatusCmd());
+    registry.reg(Arrays.asList("m", "module"), new HelpCmd());
 
     GeneratorRegistry.reg("default", new DefaultGenerator());
 
@@ -69,7 +72,7 @@ public class Main {
       Map<String, String> repo = (Map<String, String>) fjCfg.get(Const.CFG_KEY_SCAFFOLD_REPO);
 
       Map<String, String> scaffolds = new HashMap<>();
-      repo.forEach((key,val) -> {
+      repo.forEach((key, val) -> {
         Path tp = Paths.get(val);
         if (tp.toFile().isDirectory()) {
           try {
