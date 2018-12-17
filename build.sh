@@ -1,1 +1,1 @@
-native-image -cp target/fj.jar -H:Name=target/fj -H:+ReportUnsupportedElementsAtRuntime --delay-class-initialization-to-runtime=org.mozilla.javascript.VMBridge --no-server com.gxk.demo.Main
+native-image -cp target/fj.jar -H:Name=target/fj -H:IncludeResources='help.txt' -H:+ReportUnsupportedElementsAtRuntime --delay-class-initialization-to-runtime=org.mozilla.javascript.VMBridge --no-server com.gxk.demo.Main
