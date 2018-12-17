@@ -1,17 +1,15 @@
 Example usage:
   fj init
-  fj info scaffold
-  fj install(i) scaffold
-  fj uninstall(ui) scaffold
-  fj list(ls) [ALIAS]
-  fj new(n) scaffold [target]
-  fj status(st)
+  fj info scaffold // coming soon...
+  fj install(i) scaffold // install scaffold repo to fj
+  fj uninstall(ui) scaffold // reverse for install
+  fj list(ls) [ALIAS] // show scaffold list for given scaffold repo, default for all repo
+  fj new(n) scaffold [target] // core action, generate scaffold to target dir
+  fj status(st) // like git status, dir sensitive.
 
 Troubleshooting:
-  fj config // show cfg
-  fj doctor // ...
+  fj config // show cfg, dir sensitive.
 
 Further help:
-  fj commands
-  fj help [COMMAND]
+  fj cmd -h
   https://www.guxingke.com
