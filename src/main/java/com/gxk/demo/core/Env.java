@@ -76,6 +76,8 @@ public class Env<String, Object> extends HashMap<String, Object> {
     }
 
     fj.info("\n-----------");
+    fj.info(this.name);
+    fj.info("-----------");
 
     print(((HashMap) this), "");
   }

@@ -6,6 +6,7 @@ import com.gxk.demo.cmd.ConfigCmd;
 import com.gxk.demo.cmd.HelpCmd;
 import com.gxk.demo.cmd.InitCmd;
 import com.gxk.demo.cmd.ListCmd;
+import com.gxk.demo.cmd.ModuleNewCmd;
 import com.gxk.demo.cmd.NewCmd;
 import com.gxk.demo.cmd.StatusCmd;
 import com.gxk.demo.constants.Const;
@@ -46,7 +47,7 @@ public class Main {
     registry.reg(Arrays.asList("ls", "list"), new ListCmd());
     registry.reg(Arrays.asList("n", "new"), new NewCmd());
     registry.reg(Arrays.asList("st", "status"), new StatusCmd());
-    registry.reg(Arrays.asList("m", "module"), new HelpCmd());
+    registry.reg(Arrays.asList("m", "module"), new ModuleNewCmd());
 
     GeneratorRegistry.reg("default", new DefaultGenerator());
 
@@ -99,14 +100,27 @@ public class Main {
 
     // dir sensitivity
     File userFj = Paths.get(EnvHolder.getEnv().get(Const.KEY_USER_DIR).toString(), "fj.toml").toFile();
+    File userScaffold = Paths.get(EnvHolder.getEnv().get(Const.KEY_USER_DIR).toString(), ".fj").toFile();
 
-    if (userFj.exists() && userFj.isFile() && userFj.canRead()) {
+    if (userFj.exists() && userFj.isFile() && userFj.canRead() && userScaffold.exists() && userScaffold.isDirectory()) {
       Env<String, Object> env = new Env<>("user", EnvHolder.getEnv());
       new Toml().read(userFj).toMap().forEach(env::put);
 
+      //
+      try {
+        Files.list(userScaffold.toPath())
+          .filter(it -> it.toFile().getName().startsWith("template_"))
+          .forEach(it -> {
+            String absPath = it.toString();
+            String moduleName = it.toFile().getName().substring(9);
+            env.put("module." + moduleName, absPath);
+          });
+      } catch (IOException e) {
+        log.error("io err", e);
+      }
+
       EnvHolder.setEnv(env);
     }
-
   }
 
   void run(String action, String... args) {
