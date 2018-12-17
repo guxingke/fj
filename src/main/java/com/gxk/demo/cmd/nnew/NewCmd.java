@@ -1,5 +1,6 @@
-package com.gxk.demo.cmd;
+package com.gxk.demo.cmd.nnew;
 
+import com.gxk.demo.cmd.CmdHandler;
 import com.gxk.demo.constants.Const;
 import com.gxk.demo.core.Env;
 import com.gxk.demo.core.EnvHolder;
@@ -42,6 +43,24 @@ public class NewCmd implements CmdHandler {
       return;
     }
 
+    NewOptions options = NewOptions.build(args);
+
+    // cp scaffold to target
+    if (!options.getActiveStages().contains("copy")) {
+      fj.error("copy of stage not set.");
+      return;
+    }
+
+    if (!copyScaffold(args)) {
+      return;
+    }
+    fj.debug("new copy stage done\n");
+
+    if (!options.getActiveStages().contains("cfg")) {
+      fj.error("cfg of stage not set.");
+      return;
+    }
+
     if (!prepareTargetConfig(args)) {
       return;
     }
@@ -51,15 +70,14 @@ public class NewCmd implements CmdHandler {
       return;
     }
 
-    // cp scaffold to target
-    if (!copyScaffold(args)) {
-      return;
-    }
-
     // init done
-    fj.debug("new init stage done\n");
+    fj.debug("new cfg stage done\n");
 
     // do gen
+    if (!options.getActiveStages().contains("gen")) {
+      fj.error("gen of stage not set.");
+      return;
+    }
     if (!doGen(args)) {
       return;
     }
@@ -83,8 +101,9 @@ public class NewCmd implements CmdHandler {
     String targetPath = (String) env.get(Const.FJ_NEW_KEY_TARGET_PATH);
     String sourcePath = (String) env.get(Const.FJ_NEW_KEY_SCAFFOLD_PATH);
 
-    Path prjScaffolds = Paths.get(targetPath, ".fj");
+    Path prjScaffolds = Paths.get(targetPath, ".fj", "scaffold");
 
+    System.out.println(prjScaffolds.toString());
     try {
       FileUtils.copyDirectory(Paths.get(sourcePath).toFile(), prjScaffolds.toFile());
     } catch (IOException e) {
@@ -96,11 +115,15 @@ public class NewCmd implements CmdHandler {
   }
 
   private boolean genTargetConfig(String... args) {
-    Env env = EnvHolder.getEnv();
+    Env env = EnvHolder.getEnv().findEnvByName("scaffold");
+    if (env == null) {
+      log.error("not found scaffold env, nothing todo.");
+      return false;
+    }
     String targetPath = (String) env.get(Const.FJ_NEW_KEY_TARGET_PATH);
     // create dir and file
     Path targetDir = Paths.get(targetPath);
-    Path targetCfgPath = Paths.get(targetPath, "fj.toml");
+    Path targetCfgPath = Paths.get(targetPath, ".fj/fj.toml");
     try {
       if (Files.notExists(targetDir)) {
         Files.createDirectories(targetDir);
@@ -189,7 +212,7 @@ public class NewCmd implements CmdHandler {
 
     // gen cfg
     env.put(Const.FJ_GEN_KEY_SOURCE_NAME, sName);
-    env.put(Const.FJ_GEN_KEY_SOURCE_PATH, destPath + "/.fj/template");
+    env.put(Const.FJ_GEN_KEY_SOURCE_PATH, destPath + "/.fj/scaffold/template");
     env.put(Const.FJ_GEN_KEY_TARGET_PATH, destPath);
 
     return true;
@@ -200,15 +223,8 @@ public class NewCmd implements CmdHandler {
     String sPath = ((String) env.get(Const.FJ_NEW_KEY_SCAFFOLD_PATH));
     String destPath = ((String) env.get(Const.FJ_NEW_KEY_TARGET_PATH));
 
-    // override cfg
-    Map<String, String> orArgs = Arrays.stream(args)
-      .filter(it -> it.startsWith("--fj."))
-      .map(it -> it.split("="))
-      .collect(Collectors.toMap(it -> it[0].substring(2), it -> it[1]));
-
     // use default cfg
-    String useDefaultCfg = orArgs.getOrDefault("fj.new.default", "false");
-    boolean useDefault = useDefaultCfg.equals("true");
+    boolean useDefault = NewOptions.build(args).isUseDefaultCfg();
 
     // reader scaffold config , and gen apply config
     File file = Paths.get(sPath, "config.toml").toFile();

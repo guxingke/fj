@@ -13,7 +13,7 @@ public class InlineTplGenTest {
     Env env = new Env();
     env.put("test", "2x2");
 
-    String ret = new InlineTplGen().gen(env, "{{test}}");
+    String ret = new InlineTplGen(env).gen(env, "{{test}}");
 
     assertEquals("2x2", ret);
   }
@@ -23,7 +23,7 @@ public class InlineTplGenTest {
     Env env = new Env();
     env.put("test", "2x2");
 
-    String ret = new InlineTplGen().gen(env, "{{test1111}}");
+    String ret = new InlineTplGen(env).gen(env, "{{test1111}}");
 
     assertEquals("", ret);
   }

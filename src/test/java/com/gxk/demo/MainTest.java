@@ -47,6 +47,6 @@ public class MainTest {
 
   @Test
   public void test_new() {
-    main.run("new", "demo", "test", "--fj.new.default=true");
+    main.run("new", "demo", "temp", "--fj.new.default=true", "--fj.new.stage=copy,cfg,gen");
   }
 }

@@ -28,14 +28,14 @@ public class DefaultGenerator implements Generator {
   @Override
   public boolean gen(Env env) {
     String targetDir = (String) env.get(Const.FJ_GEN_KEY_TARGET_PATH);
-    if (!Files.exists(Paths.get(targetDir, "fj.toml")) || !Files.exists(Paths.get(targetDir, ".fj", "config.toml"))) {
-      fj.error("target dir have not .fj dir or have not .fj/config.toml");
+    if (!Files.exists(Paths.get(targetDir, ".fj", "fj.toml")) || !Files.exists(Paths.get(targetDir, ".fj", "scaffold", "config.toml"))) {
+      fj.error("fatal: target dir have not .fj dir or have not .fj/fj.toml");
       return false;
     }
 
     String sourceDir = (String) env.get(Const.FJ_GEN_KEY_SOURCE_PATH);
     if (sourceDir == null || sourceDir.isEmpty() || !Files.exists(Paths.get(sourceDir))) {
-      fj.error("source dir have not .fj dir or have not .fj/config.toml");
+      fj.error("fatal: illegal source dir, dir: " + sourceDir);
       return false;
     }
 

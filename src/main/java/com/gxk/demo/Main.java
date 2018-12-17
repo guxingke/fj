@@ -8,10 +8,10 @@ import com.gxk.demo.cmd.InitCmd;
 import com.gxk.demo.cmd.InstallCmd;
 import com.gxk.demo.cmd.ListCmd;
 import com.gxk.demo.cmd.ModuleNewCmd;
-import com.gxk.demo.cmd.NewCmd;
 import com.gxk.demo.cmd.StatusCmd;
 import com.gxk.demo.cmd.UninstallCmd;
 import com.gxk.demo.cmd.VersionCmd;
+import com.gxk.demo.cmd.nnew.NewCmd;
 import com.gxk.demo.constants.Const;
 import com.gxk.demo.core.Env;
 import com.gxk.demo.core.EnvHolder;
@@ -102,8 +102,8 @@ public class Main {
     }
 
     // dir sensitivity
-    File userFj = Paths.get(EnvHolder.getEnv().get(Const.KEY_USER_DIR).toString(), "fj.toml").toFile();
-    File userScaffold = Paths.get(EnvHolder.getEnv().get(Const.KEY_USER_DIR).toString(), ".fj").toFile();
+    File userFj = Paths.get(EnvHolder.getEnv().get(Const.KEY_USER_DIR).toString(), ".fj", "fj.toml").toFile();
+    File userScaffold = Paths.get(EnvHolder.getEnv().get(Const.KEY_USER_DIR).toString(), ".fj", "scaffold").toFile();
 
     if (userFj.exists() && userFj.isFile() && userFj.canRead() && userScaffold.exists() && userScaffold.isDirectory()) {
       Env<String, Object> env = new Env<>("user", EnvHolder.getEnv());
