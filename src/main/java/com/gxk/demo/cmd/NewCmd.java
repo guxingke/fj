@@ -228,19 +228,19 @@ public class NewCmd implements CmdHandler {
     }
 
     String name = strs[strs.length - 1];
-    scCfg.put("name", name);
+    scaffoldCfg.put("name", name);
     if (!useDefault) {
       // check all option value
       Map<String, Object> options = new HashMap<>();
       Scanner scanner = new Scanner(System.in);
       scaffoldCfg.forEach((key, val) -> {
         if (val instanceof String) {
-          if (!key.equals("name")) {
-            fj.info(String.format("%s : enter to use default [%s]:", key, val));
-            String option = scanner.nextLine();
-            if (!option.isEmpty()) {
-              options.put(key, option);
-            }
+          fj.info(String.format("%s : enter to use default [%s]:", key, val));
+          String option = scanner.nextLine();
+          if (!option.isEmpty()) {
+            options.put(key, option);
+          } else {
+            options.put(key, val);
           }
         } else {
           options.put(key, val);
