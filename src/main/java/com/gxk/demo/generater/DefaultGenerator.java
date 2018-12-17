@@ -1,11 +1,10 @@
 package com.gxk.demo.generater;
 
-import com.github.jknack.handlebars.Handlebars;
-import com.github.jknack.handlebars.Template;
 import com.github.jknack.handlebars.io.FileTemplateLoader;
 import com.gxk.demo.constants.Const;
 import com.gxk.demo.core.Env;
-import com.gxk.demo.generater.tpl.InlineTplGen;
+import com.gxk.demo.generater.tpl.TplGen;
+import com.gxk.demo.generater.tpl.TplGenFactory;
 import com.gxk.demo.logger.ILog;
 import com.gxk.demo.logger.LogFactory;
 import org.apache.commons.io.FileUtils;
@@ -41,7 +40,7 @@ public class DefaultGenerator implements Generator {
       return false;
     }
 
-    InlineTplGen inline = new InlineTplGen();
+    TplGen inline = TplGenFactory.createInlineTplGen(env);
 
     try {
       Files.walkFileTree(sourcePath, new SimpleFileVisitor<Path>() {
@@ -78,7 +77,7 @@ public class DefaultGenerator implements Generator {
 
     // generator by tpl
     FileTemplateLoader loader = new FileTemplateLoader(destinationPath.toFile(), ".fj");
-    Handlebars hbs = new Handlebars(loader);
+    TplGen dirBaseTplGen = TplGenFactory.createDirBaseTplGen(env, loader);
 
     try {
       Files.walkFileTree(destinationPath, new SimpleFileVisitor<Path>() {
@@ -100,9 +99,7 @@ public class DefaultGenerator implements Generator {
           String name = relativize.toString();
 
           String outName = name.substring(0, name.length() - 3);
-          Template tpl = hbs.compile(outName);
-
-          String output = tpl.apply(env);
+          String output = dirBaseTplGen.gen(env, outName);
           FileUtils.write(Paths.get(destinationPath.toString(), outName).toFile(), output, StandardCharsets.UTF_8, false);
 
           return FileVisitResult.CONTINUE;
