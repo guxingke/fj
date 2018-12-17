@@ -20,8 +20,13 @@ public abstract class Const {
   public static final String FJ_NEW_KEY_SCAFFOLD_NAME = "fj.new.scaffold.name";
   public static final String FJ_NEW_KEY_SCAFFOLD_PATH = "fj.new.scaffold.path";
 
+  public static final String FJ_NEW_KEY_TARGET_NAME= "fj.new.target.name";
   public static final String FJ_NEW_KEY_TARGET_PATH = "fj.new.target.path";
   public static final String FJ_NEW_KEY_GENERATOR = "fj.new.generator";
   public static final String FJ_NEW_VAL_DEFAULT_GENERATOR = "default";
 
+  public static final String FJ_GEN_KEY_TARGET_NAME= "fj.gen.target.name";
+  public static final String FJ_GEN_KEY_TARGET_PATH = "fj.gen.target.path";
+  public static final String FJ_GEN_KEY_SOURCE_PATH= "fj.gen.source.path";
+  public static final String FJ_GEN_KEY_SOURCE_NAME= "fj.gen.source.name";
 }

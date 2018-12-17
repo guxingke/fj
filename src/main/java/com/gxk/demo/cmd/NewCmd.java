@@ -174,8 +174,8 @@ public class NewCmd implements CmdHandler {
 
     fj.debug(sName);
     fj.debug(sPath);
-    env.put("fj.new.scaffold.name", sName);
-    env.put("fj.new.scaffold.path", sPath);
+    env.put(Const.FJ_NEW_KEY_SCAFFOLD_NAME, sName);
+    env.put(Const.FJ_NEW_KEY_SCAFFOLD_PATH, sPath);
 
     // target
     String dest = args[1];
@@ -185,7 +185,12 @@ public class NewCmd implements CmdHandler {
     }
 
     fj.debug(destPath);
-    env.put("fj.new.target.path", destPath);
+    env.put(Const.FJ_NEW_KEY_TARGET_PATH, destPath);
+
+    // gen cfg
+    env.put(Const.FJ_GEN_KEY_SOURCE_NAME, sName);
+    env.put(Const.FJ_GEN_KEY_SOURCE_PATH, destPath + "/.fj/template");
+    env.put(Const.FJ_GEN_KEY_TARGET_PATH, destPath);
 
     return true;
   }

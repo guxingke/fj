@@ -8,15 +8,8 @@ import com.gxk.demo.generater.GeneratorRegistry;
 import com.gxk.demo.logger.ILog;
 import com.gxk.demo.logger.LogFactory;
 import com.gxk.demo.util.CmdUtils;
-import com.moandjiezana.toml.TomlWriter;
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class ModuleNewCmd implements CmdHandler {
   private static final Logger log = LoggerFactory.getLogger(CmdHandler.class);
@@ -30,11 +23,6 @@ public class ModuleNewCmd implements CmdHandler {
     }
 
     if (!processArgs(args)) {
-      return;
-    }
-
-    // cp scaffold to target
-    if (!copyScaffold(args)) {
       return;
     }
 
@@ -58,52 +46,6 @@ public class ModuleNewCmd implements CmdHandler {
     }
 
     return generator.gen(EnvHolder.getEnv());
-  }
-
-  private boolean copyScaffold(String... args) {
-    Env env = EnvHolder.getEnv();
-    String targetPath = (String) env.get(Const.FJ_NEW_KEY_TARGET_PATH);
-    String sourcePath = (String) env.get(Const.FJ_NEW_KEY_SCAFFOLD_PATH);
-
-    Path prjScaffolds = Paths.get(targetPath, ".fj");
-
-    try {
-      FileUtils.copyDirectory(Paths.get(sourcePath).toFile(), prjScaffolds.toFile());
-    } catch (IOException e) {
-      log.error("io err", e);
-      return false;
-    }
-
-    return true;
-  }
-
-  private boolean genTargetConfig(String... args) {
-    Env env = EnvHolder.getEnv();
-    String targetPath = (String) env.get(Const.FJ_NEW_KEY_TARGET_PATH);
-    // create dir and file
-    Path targetDir = Paths.get(targetPath);
-    Path targetCfgPath = Paths.get(targetPath, "fj.toml");
-    try {
-      if (Files.notExists(targetDir)) {
-        Files.createDirectories(targetDir);
-      }
-      if (Files.notExists(targetCfgPath)) {
-        Files.createFile(targetCfgPath);
-      }
-    } catch (IOException e) {
-      log.error("io err", e);
-      return false;
-    }
-
-    TomlWriter writer = new TomlWriter();
-    try {
-      writer.write(env, targetCfgPath.toFile());
-    } catch (IOException e) {
-      log.error("io err", e);
-      return false;
-    }
-
-    return true;
   }
 
   private boolean checkArgs(final String... args) {
@@ -142,11 +84,15 @@ public class ModuleNewCmd implements CmdHandler {
 
     // target
     String destPath = ((String) env.get(Const.KEY_USER_DIR));
-
     fj.debug(destPath);
-    env.put("fj.new.target.name", args[1]);
+    env.put(Const.FJ_NEW_KEY_TARGET_PATH, destPath);
+
     env.put("name", args[1]);
-    env.put("fj.new.target.path", destPath);
+    // gen cfg
+    env.put(Const.FJ_GEN_KEY_SOURCE_NAME, sName);
+    env.put(Const.FJ_GEN_KEY_SOURCE_PATH, sPath);
+    env.put(Const.FJ_GEN_KEY_TARGET_NAME, args[1]);
+    env.put(Const.FJ_GEN_KEY_TARGET_PATH, destPath);
 
     return true;
   }

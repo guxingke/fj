@@ -27,18 +27,20 @@ public class DefaultGenerator implements Generator {
 
   @Override
   public boolean gen(Env env) {
-    String targetDir = (String) env.get(Const.FJ_NEW_KEY_TARGET_PATH);
-    if (!Files.exists(Paths.get(targetDir, "fj.toml"))) {
-      fj.error("target dir have not fj.toml");
-      return false;
-    }
-
-    Path sourcePath = Paths.get(targetDir, ".fj", "template");
-    Path destinationPath = Paths.get(targetDir);
-    if (!Files.exists(sourcePath) || !Files.exists(Paths.get(targetDir, ".fj", "config.toml"))) {
+    String targetDir = (String) env.get(Const.FJ_GEN_KEY_TARGET_PATH);
+    if (!Files.exists(Paths.get(targetDir, "fj.toml")) || !Files.exists(Paths.get(targetDir, ".fj", "config.toml"))) {
       fj.error("target dir have not .fj dir or have not .fj/config.toml");
       return false;
     }
+
+    String sourceDir = (String) env.get(Const.FJ_GEN_KEY_SOURCE_PATH);
+    if (sourceDir == null || sourceDir.isEmpty() || !Files.exists(Paths.get(sourceDir))) {
+      fj.error("source dir have not .fj dir or have not .fj/config.toml");
+      return false;
+    }
+
+    Path sourcePath = Paths.get(sourceDir);
+    Path destinationPath = Paths.get(targetDir);
 
     TplGen inline = TplGenFactory.createInlineTplGen(env);
 
