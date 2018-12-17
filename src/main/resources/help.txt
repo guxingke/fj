@@ -5,6 +5,7 @@ Example usage:
   fj uninstall(ui) scaffold // reverse for install
   fj list(ls) [ALIAS] // show scaffold list for given scaffold repo, default for all repo
   fj new(n) scaffold [target] // core action, generate scaffold to target dir
+  fj module(m) module name // core action, generate module scaffold to current dir, dir sensitive.
   fj status(st) // like git status, dir sensitive.
 
 Troubleshooting:
@@ -12,4 +13,6 @@ Troubleshooting:
 
 Further help:
   fj cmd -h
+  fj --help(-h)
+  fj --version(-v)
   https://www.guxingke.com

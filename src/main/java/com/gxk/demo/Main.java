@@ -11,6 +11,7 @@ import com.gxk.demo.cmd.ModuleNewCmd;
 import com.gxk.demo.cmd.NewCmd;
 import com.gxk.demo.cmd.StatusCmd;
 import com.gxk.demo.cmd.UninstallCmd;
+import com.gxk.demo.cmd.VersionCmd;
 import com.gxk.demo.constants.Const;
 import com.gxk.demo.core.Env;
 import com.gxk.demo.core.EnvHolder;
@@ -41,7 +42,7 @@ public class Main {
   public Main() {
     // register handler
     registry.reg(Arrays.asList("-h", "--help"), new HelpCmd());
-    registry.reg(Arrays.asList("-v", "--version"), (args) -> Arrays.stream(args).forEach(System.out::println));
+    registry.reg(Arrays.asList("-v", "--version"), new VersionCmd());
     registry.reg("init", new InitCmd());
     registry.reg("config", new ConfigCmd());
     registry.reg(Arrays.asList("i", "install"), new InstallCmd());
