@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -232,9 +233,9 @@ public class NewCmd implements CmdHandler {
       return false;
     }
 
-    Env scCfg = new Env("scaffold", env);
+    Env<String, Object> scCfg = new Env<>("scaffold", env);
 
-    Map scaffoldCfg = new Toml().read(file).toMap();
+    Map<String, Object> scaffoldCfg = new Toml().read(file).toMap();
     if (scaffoldCfg.isEmpty()) {
       fj.error("empty scaffold config, nothing to do .");
       return false;
@@ -251,7 +252,7 @@ public class NewCmd implements CmdHandler {
     scaffoldCfg.put("name", name);
     if (!useDefault) {
       // check all option value
-      Map options = new HashMap<>();
+      Map<String, Object> options = new HashMap<>();
       Scanner scanner = new Scanner(System.in);
       scaffoldCfg.forEach((key, val) -> {
         if (val instanceof String) {
@@ -266,9 +267,9 @@ public class NewCmd implements CmdHandler {
           options.put(key, val);
         }
       });
-      options.forEach((key, val) -> scCfg.put(String.valueOf(key), val));
+      options.forEach(scCfg::put);
     } else {
-      scaffoldCfg.forEach((key, val) -> scCfg.put(String.valueOf(key), val));
+      scaffoldCfg.forEach(scCfg::put);
     }
     EnvHolder.setEnv(scCfg);
 
