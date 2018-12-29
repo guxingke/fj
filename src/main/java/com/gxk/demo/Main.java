@@ -55,7 +55,7 @@ public class Main {
     GeneratorRegistry.reg("default", new DefaultGenerator());
 
     // init cfg
-    Env<String, Object> sysCfg = new Env<>();
+    Env sysCfg = new Env();
     sysCfg.put(Const.KEY_USER_HOME, System.getProperty("user.home"));
     sysCfg.put(Const.KEY_USER_DIR, System.getProperty("user.dir"));
     sysCfg.put(Const.FJ_KEY_CFG_PATH, System.getProperty("user.home") + "/" + Const.FJ_CFG_PATH);
@@ -67,19 +67,19 @@ public class Main {
     EnvHolder.setEnv(sysCfg);
 
     // fj config
-    Env<String, Object> fjCfg = new Env<>("fj", sysCfg);
+    Env fjCfg = new Env("fj", sysCfg);
     Path path = Paths.get((String) sysCfg.get(Const.FJ_KEY_CFG_PATH));
 
     if (path.toFile().exists()) {
-      Map<String, Object> map = new Toml().read(path.toFile()).toMap();
-      map.forEach(fjCfg::put);
+      Map map = new Toml().read(path.toFile()).toMap();
+      map.forEach((key, val) -> fjCfg.put(((String) key), val));
 
       EnvHolder.setEnv(fjCfg);
     }
 
     if (fjCfg.containsKey(Const.CFG_KEY_SCAFFOLD_REPO)) {
       // fj dynamic cfg
-      Env<String, Object> dyCfg = new Env<>("dy", fjCfg);
+      Env dyCfg = new Env("dy", fjCfg);
       Map<String, String> repo = (Map<String, String>) fjCfg.get(Const.CFG_KEY_SCAFFOLD_REPO);
 
       Map<String, String> scaffolds = new HashMap<>();
@@ -106,7 +106,7 @@ public class Main {
     File userScaffold = Paths.get(EnvHolder.getEnv().get(Const.KEY_USER_DIR).toString(), ".fj", "scaffold").toFile();
 
     if (userFj.exists() && userFj.isFile() && userFj.canRead() && userScaffold.exists() && userScaffold.isDirectory()) {
-      Env<String, Object> env = new Env<>("user", EnvHolder.getEnv());
+      Env env = new Env("user", EnvHolder.getEnv());
       new Toml().read(userFj).toMap().forEach(env::put);
 
       //

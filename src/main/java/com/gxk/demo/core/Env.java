@@ -6,44 +6,48 @@ import com.gxk.demo.logger.LogFactory;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Env<String, Object> extends HashMap<String, Object> {
+public class Env {
 
   private static final ILog fj = LogFactory.getLog();
 
-  private final Env<String, Object> parent;
-  private final java.lang.String name;
+  private final Env parent;
+  private final String name;
+  private final Map<String, Object> kv;
 
   public Env() {
     super();
     this.parent = null;
     this.name = "sys";
+    this.kv = new HashMap<>();
   }
 
-  public Env(String name, Env<String, Object> parent) {
+  public Env(String name, Env parent) {
     this.parent = parent;
     this.name = parent.getName() + "." + name;
+    this.kv = new HashMap<>();
   }
 
-  @Override
-  public boolean containsKey(java.lang.Object key) {
+  public boolean containsKey(String key) {
     if (this.parent == null) {
-      return super.containsKey(key);
+      return this.kv.containsKey(key);
     }
 
-    return super.containsKey(key) || this.parent.containsKey(key);
+    return this.parent.containsKey(key);
   }
 
-  @Override
-  public Object get(java.lang.Object key) {
-    Object val = super.get(key);
+  public Object get(String key) {
+    Object val = this.kv.get(key);
     if (val == null && this.parent != null) {
       val = this.parent.get(key);
     }
     return val;
   }
 
-  @Override
-  public Object getOrDefault(java.lang.Object key, Object defaultValue) {
+  public void put(String key, Object val) {
+    this.kv.put(key, val);
+  }
+
+  public Object getOrDefault(String key, Object defaultValue) {
     Object val = this.get(key);
     if (val == null) {
       return defaultValue;
@@ -51,12 +55,12 @@ public class Env<String, Object> extends HashMap<String, Object> {
     return val;
   }
 
-  public Env<String, Object> getParent() {
+  public Env getParent() {
     return parent;
   }
 
   public String getName() {
-    return (String) name;
+    return name;
   }
 
   public Env findEnvByName(String name) {
@@ -79,7 +83,7 @@ public class Env<String, Object> extends HashMap<String, Object> {
     fj.info(this.name);
     fj.info("-----------");
 
-    print(((HashMap) this), "");
+    print(this.kv, "");
   }
 
   public void print(boolean recursive) {
@@ -88,17 +92,17 @@ public class Env<String, Object> extends HashMap<String, Object> {
       return;
     }
 
-    print(((HashMap) this), "");
+    print(this.kv, "");
   }
 
-  void print(Map<java.lang.String, java.lang.Object> map, java.lang.String prefix) {
+  void print(Map<String, Object> map, java.lang.String prefix) {
     map.forEach((key, val) -> {
       java.lang.String np = prefix + "." + key;
       if (prefix.isEmpty()) {
         np = key;
       }
       if (val instanceof Map) {
-        print((Map<java.lang.String, java.lang.Object>) val, np);
+        print((Map<String, Object>) val, np);
       } else {
         fj.info(np + " = " + val);
       }
