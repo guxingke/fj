@@ -1,26 +1,24 @@
 # Fj
+根据模板生成样板项目, 加速开发.
 
-# PRE
-- maven 3.3+
-- jdk 1.8+
-- graalvm 1.0+
-
-# Build
-```bash
-mvn clean package
-
-./build.sh # build binary executable file named fj.
-
+# 快速使用
+```
+wget 'https://github.com/guxingke/fj/blob/master/dist/fj'
+./fj init
+./fj n demo temp
+```
+如果一切正常, 当前目录会生成 temp 目录.
+```
+tree temp
+# temp
+# ├── gen_finish.sh
+# └── temp.py
+#
+# 0 directories, 2 files
 ```
 
-# Install
-```bash
-mv target/fj ~/.local/bin
-```
-
-# Showcase
-
-
+# Dev
+[dev](docs/dev.md)
 
 # Note
 it build for myself, just a demo.
