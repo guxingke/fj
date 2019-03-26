@@ -29,6 +29,14 @@ public class HandlebarsFactory {
           cs[0] -= 32;
           return String.valueOf(cs);
         });
+
+    handlebars.registerHelper("capitalize",
+        (con, options) -> {
+          char[] cs = ((String) con).toCharArray();
+          cs[0] -= 32;
+          return String.valueOf(cs);
+        });
+
     // java package name , 下划线,中横线去除 , special char remove -> sc_rm
     handlebars.registerHelper("sc_rm",
       (con, options) -> con.toString().replaceAll("-|_", ""));
