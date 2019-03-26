@@ -24,5 +24,4 @@ tree temp
 it build for myself, just a demo.
 
 # Changelog
-- =, !=.
-- single query condition.
+- 基本功能完成
