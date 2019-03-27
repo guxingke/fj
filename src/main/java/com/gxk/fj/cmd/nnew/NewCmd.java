@@ -14,6 +14,7 @@ import com.moandjiezana.toml.TomlWriter;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
 import java.io.IOException;
@@ -123,6 +124,7 @@ public class NewCmd implements CmdHandler {
     // create dir and file
     Path targetDir = Paths.get(targetPath);
     Path targetCfgPath = Paths.get(targetPath, ".fj/fj.toml");
+    Path targetyamlCfgPath = Paths.get(targetPath, ".fj/fj.yaml");
     try {
       if (Files.notExists(targetDir)) {
         Files.createDirectories(targetDir);
@@ -130,14 +132,20 @@ public class NewCmd implements CmdHandler {
       if (Files.notExists(targetCfgPath)) {
         Files.createFile(targetCfgPath);
       }
+      if (Files.notExists(targetyamlCfgPath)) {
+        Files.createFile(targetyamlCfgPath);
+      }
     } catch (IOException e) {
       log.error("io err", e);
       return false;
     }
 
+    Yaml yaml = new Yaml();
     TomlWriter writer = new TomlWriter();
     try {
       writer.write(env, targetCfgPath.toFile());
+      String dump = yaml.dump(env);
+      Files.write(targetyamlCfgPath, dump.getBytes());
     } catch (IOException e) {
       log.error("io err", e);
       return false;

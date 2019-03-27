@@ -49,85 +49,18 @@ public abstract class AbstractGenerator implements Generator {
       return false;
     }
 
+    genDirAndCopyTpl(env, sourcePath, destinationPath);
+
+    doGen(env, destinationPath);
+
+    delTpl(destinationPath);
+
+    return true;
+  }
+
+  private void delTpl(Path path) {
     try {
-      Files.walkFileTree(sourcePath, new SimpleFileVisitor<Path>() {
-        @Override
-        public FileVisitResult preVisitDirectory(
-            Path dir,
-            BasicFileAttributes attrs
-        ) throws IOException {
-          Path realPath = destinationPath.resolve(sourcePath.relativize(dir));
-          Path transferPath = Paths.get(inlineGen(env, realPath.toString()));
-          if (Files.notExists(transferPath)) {
-            Files.createDirectories(transferPath);
-          }
-          return FileVisitResult.CONTINUE;
-        }
-
-        @Override
-        public FileVisitResult visitFile(
-            Path file,
-            BasicFileAttributes attrs
-        ) throws IOException {
-          // dir
-          Path dirSourcePath = destinationPath.resolve(sourcePath.relativize(file.getParent()));
-          Path dirPath = Paths.get(inlineGen(env, dirSourcePath.toString()));
-          // file
-          String fileName = inlineGen(env, file.getFileName().toString());
-          Path path = dirPath.resolve(fileName + ".fj");
-
-          FileUtils.copyFile(file.toFile(), path.toFile());
-
-          return FileVisitResult.CONTINUE;
-        }
-      });
-    } catch (IOException e) {
-      log.error("io err", e);
-    }
-
-    log.debug("gen dir and tpl file done");
-
-    try {
-      Files.walkFileTree(destinationPath, new SimpleFileVisitor<Path>() {
-        @Override
-        public FileVisitResult preVisitDirectory(
-            Path dir,
-            BasicFileAttributes attrs
-        ) throws IOException {
-          if (dir.endsWith(".fj")) {
-            return FileVisitResult.SKIP_SUBTREE;
-          }
-          return FileVisitResult.CONTINUE;
-        }
-
-        @Override
-        public FileVisitResult visitFile(
-            Path file,
-            BasicFileAttributes attrs
-        ) throws IOException {
-          if (!file.toFile().getName().endsWith(".fj")) {
-            return FileVisitResult.CONTINUE;
-          }
-          Path relativize = destinationPath.relativize(file);
-          String name = relativize.toString();
-
-          String outName = name.substring(0, name.length() - 3);
-          String output = tplGen(env, outName);
-          FileUtils.write(Paths.get(destinationPath.toString(), outName).toFile(), output,
-              StandardCharsets.UTF_8, false
-          );
-
-          return FileVisitResult.CONTINUE;
-        }
-      });
-    } catch (IOException e) {
-      log.error("io err", e);
-    }
-
-    fj.debug("gen output done\n");
-
-    try {
-      Files.walkFileTree(destinationPath, new SimpleFileVisitor<Path>() {
+      Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
         @Override
         public FileVisitResult preVisitDirectory(
             Path dir,
@@ -156,8 +89,87 @@ public abstract class AbstractGenerator implements Generator {
     } catch (IOException e) {
       log.error("io err", e);
     }
+  }
 
-    return true;
+  private void doGen(Env env, Path path) {
+    try {
+      Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+        @Override
+        public FileVisitResult preVisitDirectory(
+            Path dir,
+            BasicFileAttributes attrs
+        ) throws IOException {
+          if (dir.endsWith(".fj")) {
+            return FileVisitResult.SKIP_SUBTREE;
+          }
+          return FileVisitResult.CONTINUE;
+        }
+
+        @Override
+        public FileVisitResult visitFile(
+            Path file,
+            BasicFileAttributes attrs
+        ) throws IOException {
+          if (!file.toFile().getName().endsWith(".fj")) {
+            return FileVisitResult.CONTINUE;
+          }
+          Path relativize = path.relativize(file);
+          String name = relativize.toString();
+
+          String outName = name.substring(0, name.length() - 3);
+          String output = tplGen(env, outName);
+          FileUtils.write(Paths.get(path.toString(), outName).toFile(), output,
+              StandardCharsets.UTF_8, false
+          );
+
+          return FileVisitResult.CONTINUE;
+        }
+      });
+    } catch (IOException e) {
+      log.error("io err", e);
+    }
+
+    fj.debug("gen output done\n");
+  }
+
+  public void genDirAndCopyTpl(Env env, Path src, Path dest) {
+    try {
+      Files.walkFileTree(src, new SimpleFileVisitor<Path>() {
+        @Override
+        public FileVisitResult preVisitDirectory(
+            Path dir,
+            BasicFileAttributes attrs
+        ) throws IOException {
+          Path realPath = dest.resolve(src.relativize(dir));
+          Path transferPath = Paths.get(inlineGen(env, realPath.toString()));
+          if (Files.notExists(transferPath)) {
+            Files.createDirectories(transferPath);
+          }
+          return FileVisitResult.CONTINUE;
+        }
+
+        @Override
+        public FileVisitResult visitFile(
+            Path file,
+            BasicFileAttributes attrs
+        ) throws IOException {
+          // dir
+          Path dirSourcePath = dest.resolve(src.relativize(file.getParent()));
+          Path dirPath = Paths.get(inlineGen(env, dirSourcePath.toString()));
+          // file
+          String fileName = inlineGen(env, file.getFileName().toString());
+          Path path = dirPath.resolve(fileName + ".fj");
+
+          FileUtils.copyFile(file.toFile(), path.toFile());
+
+          return FileVisitResult.CONTINUE;
+        }
+      });
+    } catch (IOException e) {
+      log.error("io err", e);
+    }
+
+    log.debug("gen dir and tpl file done");
   }
 
   protected abstract boolean init(Env env);
