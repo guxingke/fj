@@ -20,7 +20,14 @@ public class YashaGenerator extends AbstractGenerator {
   @Override
   protected boolean init(Env env) {
     // generator env to yaml
-
+    Path extPath = destinationPath.resolve(".fj/scaffold/ext.py");
+    if (!extPath.toFile().exists()) {
+      try {
+        Files.createFile(extPath);
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
     return true;
   }
 
@@ -44,7 +51,7 @@ public class YashaGenerator extends AbstractGenerator {
       e.printStackTrace();
     }
 
-    String tpl = "yasha -v .fj/fj.yaml -o /tmp/fj.output /tmp/fj.input";
+    String tpl = "yasha -e .fj/scaffold/ext.py -v .fj/fj.toml -o /tmp/fj.output /tmp/fj.input";
     String cmd = String.format(tpl, input);
 
     String[] args = cmd.split(" ");
@@ -74,7 +81,7 @@ public class YashaGenerator extends AbstractGenerator {
       e.printStackTrace();
     }
 
-    String tpl = "yasha -v .fj/fj.yaml -o /tmp/fj_%s %s";
+    String tpl = "yasha -e .fj/scaffold/ext.py -v .fj/fj.toml -o /tmp/fj_%s %s";
     String cmd = String.format(tpl, test.hashCode(), test);
 
     String[] args = cmd.split(" ");
